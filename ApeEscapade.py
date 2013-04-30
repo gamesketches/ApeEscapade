@@ -34,6 +34,10 @@ class Player(pygame.sprite.Sprite):
             if self.timer > 30:
                 self.net = False
                 self.timer = 0
+        if pygame.key.get_pressed()[K_RIGHT]:
+            self.rect = self.rect.move((1,0))
+        elif pygame.key.get_pressed()[K_LEFT]:
+            self.rect = self.rect.move((-1,0))
 
 def main():
     pygame.init()
