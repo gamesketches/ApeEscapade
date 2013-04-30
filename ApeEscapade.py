@@ -1,6 +1,9 @@
 import os, pygame, sys
 from pygame.locals import *
 
+main_dir = os.path.split(os.path.abspath(sys.argv[0]))[0]
+data_dir = os.path.join(main_dir, 'data')
+
 def load_image(name, colorkey=None):
     fullname = os.path.join(data_dir, name)
     try:
@@ -31,4 +34,34 @@ class Player(pygame.sprite.Sprite):
             if self.timer > 30:
                 self.net = False
                 self.timer = 0
-        
+
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((700, 400))
+    pygame.display.set_caption('Ape Escapade!')
+    pygame.mouse.set_visible(0)
+
+    background = pygame.Surface(screen.get_size())
+    background = background.convert()
+    background.fill((250, 250, 250))
+
+    screen.blit(background, (0,0))
+    pygame.display.flip()
+
+    spike = Player()
+    allsprites = pygame.sprite.Group()
+    allsprites.add(spike)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                pygame.quit()
+
+        allsprites.update()
+        allsprites.draw(screen)
+        pygame.display.flip()
+
+if __name__ == '__main__':
+    main()
