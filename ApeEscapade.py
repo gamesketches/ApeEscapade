@@ -26,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.moveRate = 10
         self.net = False
         self.timer = 0
+        self.grounded = False
 
     def update(self):
         "Move character, start netting if commanded, update counter"
@@ -34,10 +35,18 @@ class Player(pygame.sprite.Sprite):
             if self.timer > 30:
                 self.net = False
                 self.timer = 0
+        if not self.grounded:
+            self.rect = self.rect.move((0,1))
         if pygame.key.get_pressed()[K_RIGHT]:
             self.rect = self.rect.move((1,0))
         elif pygame.key.get_pressed()[K_LEFT]:
             self.rect = self.rect.move((-1,0))
+        if pygame.key.get_pressed()[K_SPACE]:
+            self.net = True
+
+    def checkGrounded(self, groundRect):
+        if self.rect.colliderect(groundRect):
+            self.grounded = True
 
 def main():
     pygame.init()
@@ -49,9 +58,16 @@ def main():
     background = background.convert()
     background.fill((250, 250, 250))
 
-    screen.blit(background, (0,0))
-    pygame.display.flip()
+    ground = pygame.Surface((700, 50))
+    ground = ground.convert()
+    ground.fill((0,0,0))
 
+    groundRect = pygame.Rect(0, 350, 700, 50)
+
+    screen.blit(background, (0,0))
+    screen.blit(ground,(0,350))
+    pygame.display.flip()
+    
     spike = Player()
     allsprites = pygame.sprite.Group()
     allsprites.add(spike)
@@ -66,6 +82,7 @@ def main():
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 pygame.quit()
 
+        spike.checkGrounded(groundRect)
         allsprites.update()
         allsprites.draw(screen)
         pygame.display.flip()
