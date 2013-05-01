@@ -56,7 +56,10 @@ def main():
     allsprites = pygame.sprite.Group()
     allsprites.add(spike)
 
+    clock = pygame.time.Clock()
+
     while True:
+        clock.tick(60)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
