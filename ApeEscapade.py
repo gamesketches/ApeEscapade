@@ -5,6 +5,7 @@ main_dir = os.path.split(os.path.abspath(sys.argv[0]))[0]
 data_dir = os.path.join(main_dir, 'data')
 
 TERMINALVELOCITY = 2
+TERMINALHORIZONTALVELOCITY = 5
 NETTIME = 30
 
 allsprites = pygame.sprite.Group()
@@ -37,26 +38,33 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         "Move character, start netting if commanded, update counter"
         if self.net:
-            self.timer += 0
+            self.timer += 1
             if self.timer > NETTIME:
                 self.net = False
                 self.timer = 0
         if not self.grounded:
-            #self.rect = self.rect.move((0,1))
+            #vertical velocity deterioration
             if self.velocity[1] <= TERMINALVELOCITY:
                 self.velocity[1] += 1
-        if pygame.key.get_pressed()[K_RIGHT]:
-            #self.rect = self.rect.move((1,0))
+        else:
+            #horizontal velocity deterioration
+            if self.velocity[0] > 0:
+                self.velocity[0] -= 0.3
+            else:
+                self.velocity[0] += 0.3
+
+        # input handling
+        if pygame.key.get_pressed()[K_RIGHT] and self.velocity[0] < TERMINALHORIZONTALVELOCITY:
             self.velocity[0] += 1
-        elif pygame.key.get_pressed()[K_LEFT]:
-            #self.rect = self.rect.move((-1,0))
+        elif pygame.key.get_pressed()[K_LEFT] and self.velocity[0] > -TERMINALHORIZONTALVELOCITY:
             self.velocity[0] += -1
-        elif pygame.key.get_pressed()[K_UP]:
-            self.velocity[1] += -1
+        elif pygame.key.get_pressed()[K_UP] and self.grounded:
+            self.velocity[1] += -20
+            self.grounded = False
         if pygame.key.get_pressed()[K_SPACE] and not self.net:
             self.net = True
             allsprites.add(Net(self.rect.x +self.rect.width, self.rect.y))
-
+        #Add in changes to velocity
         self.rect = self.rect.move((self.velocity[0],self.velocity[1]))
 
     def checkGrounded(self, groundRect):
