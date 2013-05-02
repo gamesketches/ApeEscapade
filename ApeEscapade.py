@@ -54,9 +54,11 @@ class Player(pygame.sprite.Sprite):
                 self.velocity[0] += 0.3
 
         # input handling
-        if pygame.key.get_pressed()[K_RIGHT] and self.velocity[0] < TERMINALHORIZONTALVELOCITY:
+        if pygame.key.get_pressed()[K_RIGHT] and self.velocity[0] < TERMINALHORIZONTALVELOCITY \
+           and not self.net:
             self.velocity[0] += 1
-        elif pygame.key.get_pressed()[K_LEFT] and self.velocity[0] > -TERMINALHORIZONTALVELOCITY:
+        elif pygame.key.get_pressed()[K_LEFT] and self.velocity[0] > -TERMINALHORIZONTALVELOCITY \
+             and not self.net:
             self.velocity[0] += -1
         elif pygame.key.get_pressed()[K_UP] and self.grounded:
             self.velocity[1] += -20
