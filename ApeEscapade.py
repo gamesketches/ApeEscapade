@@ -5,6 +5,9 @@ main_dir = os.path.split(os.path.abspath(sys.argv[0]))[0]
 data_dir = os.path.join(main_dir, 'data')
 
 TERMINALVELOCITY = 2
+NETTIME = 30
+
+allsprites = pygame.sprite.Group()
 
 def load_image(name, colorkey=None):
     fullname = os.path.join(data_dir, name)
@@ -35,7 +38,7 @@ class Player(pygame.sprite.Sprite):
         "Move character, start netting if commanded, update counter"
         if self.net:
             self.timer += 0
-            if self.timer > 30:
+            if self.timer > NETTIME:
                 self.net = False
                 self.timer = 0
         if not self.grounded:
@@ -52,6 +55,7 @@ class Player(pygame.sprite.Sprite):
             self.velocity[1] += -1
         if pygame.key.get_pressed()[K_SPACE]:
             self.net = True
+            allsprites.add(Net(self.rect.x, self.rect.y))
 
         self.rect = self.rect.move((self.velocity[0],self.velocity[1]))
 
@@ -60,6 +64,17 @@ class Player(pygame.sprite.Sprite):
             self.grounded = True
             self.rect = self.rect.move(0,-1)
             self.velocity[1] = 0
+
+class Net(pygame.sprite.Sprite):
+    def __init__(self, startingX,startingY):
+        pygame.sprite.Sprite.__init__(self)
+        self.image, self.rect = load_image('net.bmp')
+        self.timer = 0
+
+    def update(self):
+        self.timer += 1
+        if self.timer >= NETTIME:
+            self.kill()
 
 class Monkey(pygame.sprite.Sprite):
     def __init__(self, leftBound=0, rightBound=700):
@@ -97,7 +112,6 @@ def main():
     spike = Player()
 
     monkey = Monkey(0, 500)
-    allsprites = pygame.sprite.Group()
     allsprites.add(spike, monkey)
 
     clock = pygame.time.Clock()
