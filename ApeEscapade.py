@@ -62,13 +62,17 @@ class Player(pygame.sprite.Sprite):
             self.velocity[1] = 0
 
 class Monkey(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, leftBound=0, rightBound=700):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image('monkey.bmp')
         self.moveRate = 5
+        self.rightBound = rightBound
+        self.leftBound = leftBound
 
     def update(self):
-        self.rect = self.rect.move((5,0))
+        self.rect = self.rect.move((self.moveRate,0))
+        if self.rect.x >= self.rightBound or self.rect.x <= self.leftBound:
+            self.moveRate *= -1
 
 def main():
     pygame.init()
@@ -92,7 +96,7 @@ def main():
     
     spike = Player()
 
-    monkey = Monkey()
+    monkey = Monkey(0, 500)
     allsprites = pygame.sprite.Group()
     allsprites.add(spike, monkey)
 
@@ -106,6 +110,9 @@ def main():
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 pygame.quit()
 
+        screen.blit(background, (0,0))
+        screen.blit(ground,(0,350))
+        
         spike.checkGrounded(groundRect)
         allsprites.update()
         allsprites.draw(screen)
