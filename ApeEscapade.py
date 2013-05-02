@@ -53,9 +53,9 @@ class Player(pygame.sprite.Sprite):
             self.velocity[0] += -1
         elif pygame.key.get_pressed()[K_UP]:
             self.velocity[1] += -1
-        if pygame.key.get_pressed()[K_SPACE]:
+        if pygame.key.get_pressed()[K_SPACE] and not self.net:
             self.net = True
-            allsprites.add(Net(self.rect.x, self.rect.y))
+            allsprites.add(Net(self.rect.x +self.rect.width, self.rect.y))
 
         self.rect = self.rect.move((self.velocity[0],self.velocity[1]))
 
@@ -69,6 +69,7 @@ class Net(pygame.sprite.Sprite):
     def __init__(self, startingX,startingY):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image('net.bmp')
+        self.rect = self.rect.move((startingX,startingY))
         self.timer = 0
 
     def update(self):
@@ -88,6 +89,10 @@ class Monkey(pygame.sprite.Sprite):
         self.rect = self.rect.move((self.moveRate,0))
         if self.rect.x >= self.rightBound or self.rect.x <= self.leftBound:
             self.moveRate *= -1
+        for i in allsprites.sprites():
+            if type(i) == Net:
+                if self.rect.colliderect(i.rect):
+                    self.kill()
 
 def main():
     pygame.init()
