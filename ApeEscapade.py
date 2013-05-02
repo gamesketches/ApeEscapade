@@ -4,6 +4,8 @@ from pygame.locals import *
 main_dir = os.path.split(os.path.abspath(sys.argv[0]))[0]
 data_dir = os.path.join(main_dir, 'data')
 
+TERMINALVELOCITY = 2
+
 def load_image(name, colorkey=None):
     fullname = os.path.join(data_dir, name)
     try:
@@ -23,7 +25,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image("spike.bmp")
-        self.moveRate = 10
+        self.terminalVelocity = 2
+        self.velocity = [0,0]
         self.net = False
         self.timer = 0
         self.grounded = False
@@ -36,17 +39,36 @@ class Player(pygame.sprite.Sprite):
                 self.net = False
                 self.timer = 0
         if not self.grounded:
-            self.rect = self.rect.move((0,1))
+            #self.rect = self.rect.move((0,1))
+            if self.velocity[1] <= TERMINALVELOCITY:
+                self.velocity[1] += 1
         if pygame.key.get_pressed()[K_RIGHT]:
-            self.rect = self.rect.move((1,0))
+            #self.rect = self.rect.move((1,0))
+            self.velocity[0] += 1
         elif pygame.key.get_pressed()[K_LEFT]:
-            self.rect = self.rect.move((-1,0))
+            #self.rect = self.rect.move((-1,0))
+            self.velocity[0] += -1
+        elif pygame.key.get_pressed()[K_UP]:
+            self.velocity[1] += -1
         if pygame.key.get_pressed()[K_SPACE]:
             self.net = True
+
+        self.rect = self.rect.move((self.velocity[0],self.velocity[1]))
 
     def checkGrounded(self, groundRect):
         if self.rect.colliderect(groundRect):
             self.grounded = True
+            self.rect = self.rect.move(0,-1)
+            self.velocity[1] = 0
+
+class Monkey(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image, self.rect = load_image('monkey.bmp')
+        self.moveRate = 5
+
+    def update(self):
+        self.rect = self.rect.move((5,0))
 
 def main():
     pygame.init()
@@ -69,8 +91,10 @@ def main():
     pygame.display.flip()
     
     spike = Player()
+
+    monkey = Monkey()
     allsprites = pygame.sprite.Group()
-    allsprites.add(spike)
+    allsprites.add(spike, monkey)
 
     clock = pygame.time.Clock()
 
