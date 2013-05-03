@@ -70,10 +70,16 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.rect.move((self.velocity[0],self.velocity[1]))
 
     def checkGrounded(self, groundRect):
-        if self.rect.colliderect(groundRect):
+        if groundRect.colliderect(self.rect.move(0,self.velocity[1])):
             self.grounded = True
-            self.rect = self.rect.move(0,-1)
             self.velocity[1] = 0
+            self.rect 
+            return True
+        #if self.rect.colliderect(groundRect):
+         #   self.grounded = True
+          #  self.rect = self.rect.move(0,-1)
+           # self.velocity[1] = 0
+            #return True
 
 class Net(pygame.sprite.Sprite):
     def __init__(self, startingX,startingY):
@@ -120,8 +126,15 @@ def main():
 
     groundRect = pygame.Rect(0, 350, 700, 50)
 
+    platform = pygame.Surface((400, 50))
+    platform = platform.convert()
+    platform.fill((250,0,0))
+
+    platformRect = pygame.Rect(300, 200, 400, 50)
+
     screen.blit(background, (0,0))
     screen.blit(ground,(0,350))
+    screen.blit(platform, (300, 100))
     pygame.display.flip()
     
     spike = Player()
@@ -141,8 +154,10 @@ def main():
 
         screen.blit(background, (0,0))
         screen.blit(ground,(0,350))
+        screen.blit(platform,(300,200))
         
-        spike.checkGrounded(groundRect)
+        if not spike.checkGrounded(groundRect) and not spike.checkGrounded(platformRect):
+            spike.grounded = False
         allsprites.update()
         allsprites.draw(screen)
         pygame.display.flip()
